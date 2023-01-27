@@ -1,0 +1,6 @@
+account:
+  username: ''
+  password: ''
+
+page:
+  url: 'http://jwxt.hbuas.edu.cn/jsxsd/'
