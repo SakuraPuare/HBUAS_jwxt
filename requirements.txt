@@ -1,3 +1,4 @@
+httpx~=0.23.3
 pyyaml~=6.0
 pandas~=1.5.2
 xlrd~=2.0.1
