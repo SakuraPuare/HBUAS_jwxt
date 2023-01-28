@@ -1,0 +1,111 @@
+name: 🐞 错误报告
+description: 创建一个错误报告来帮助我们改进
+title: "[BUG] 标题"
+labels: [bug, need review]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        [GitHub Issues](https://github.com/SakuraPuare/HBUAS_jwxt/issues) 专门用于错误报告和功能需求，这意味着我们不接受使用问题。如果您打开的问题不符合要求，它将会被无条件关闭。
+        请在提交问题前阅读以下内容。如果您不遵守以下内容，您的问题可能会被关闭。
+
+        有关程序使用问题，请通过以下途径：
+         - 阅读文档以解决您的问题
+         - 在相关社区内寻求他人解答
+         - 在 [GitHub Discussions](https://github.com/SakuraPuare/HBUAS_jwxt/discussions) 上提问
+         - 在网络中搜索是否有人遇到过类似的问题
+
+        如果您不知道如何有效、准确地提出一个问题，我们建议您先阅读[《提问的智慧》](https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way/blob/main/README-zh_CN.md)。
+  - type: checkboxes
+    attributes:
+      label: 报告清单
+      description: 请确认您已遵守所有必选项。
+      options:
+        - label: 我已仔细阅读并了解上述注意事项。
+          required: true
+        - label: 我已经搜索过相关问题，但没有找到解决方案。
+          required: true
+        - label: 我已使用最新版本测试过，确认问题依旧存在。
+          required: true
+        - label: 我确定在 [GitHub Issues](https://github.com/SakuraPuare/HBUAS_jwxt/issues) 中没有相同或相似的问题。
+          required: true
+        - label: 我愿意补充更多信息，如果需要
+          required: true
+        - label: 我愿意参与到项目的开发中，同时有足够的能力和精力来解决这个问题
+          required: false
+  - type: textarea
+    attributes:
+      label: 问题版本
+      description: 这个问题出现在哪个版本上？
+      placeholder: |
+        发布版本号或Commit ID 如：v1.0.0 或 1a2b3c4
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 问题描述
+      description: 请清晰简洁地说明问题是什么，并解释您是如何遇到此问题的，以及您为此做出的尝试。
+      placeholder: |
+        在这个环境下，使用这个配置，运行 '...'，出现了这样的错误...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 复现步骤
+      description: |
+        提供能复现此问题的详细操作步骤。如果可能，请尝试提供一个可复现的测试用例，该测试用例是发生问题所需的最低限度。
+        推荐阅读[《如何创建一个最小的、可复现的示例》](https://stackoverflow.com/help/minimal-reproducible-example)
+      placeholder: |
+        1. 在这个环境...
+        2. 使用这个配置...
+        3. 运行 '...'
+        4. 出现错误...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 预期行为
+      description: 请清晰简洁地说明您期望的行为。
+      placeholder: |
+        我希望在这个环境下，使用这个配置，运行 '...'，得到这样的结果...
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: 实际行为
+      description: 请清晰简洁地说明实际发生的情况。
+      placeholder: |
+        在这个环境下，使用这个配置，运行 '...'，得到了这样的结果...
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: 日志信息
+      description: 请提供您的日志信息，如果有的话。
+      placeholder: |
+        日志信息中可能包含您的个人信息，请注意保护隐私。
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: 环境信息
+      description: 请提供您的运行环境信息，例如操作系统、Node.js 版本、npm 版本等。
+      placeholder: |
+        例如：
+        - OS: Windows 10
+        - Node: 14.15.1
+        - npm: 6.14.8
+      value: |
+        - OS:
+        - Node:
+        - npm:
+      render: markdown
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: 其他信息
+      description: |
+        提供关于此问题的其他任何信息或截图。
+    validations:
+      required: false
