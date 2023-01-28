@@ -79,6 +79,7 @@ class Schedule:
         path = pathlib.Path(name)
         with open(path, 'wb') as f:
             pickle.dump(self.schedule, f)
+
     @staticmethod
     def save_schedule_as_xls(byte: bytes, name: str = 'schedule.xls') -> None:
         path = pathlib.Path(name).with_suffix('.xls')
@@ -94,7 +95,12 @@ class Schedule:
 
 
 class Lesson:
-    def __init__(self, name='', teacher: Union[str, list] = [], time: Union[str, list] = [], location: str = ''):
+    def __init__(self, name='', teacher=None, time=None, location: str = ''):
+        if teacher is None:
+            teacher = []
+        if time is None:
+            time = []
+
         self.name: str = name
         self.time = self._fmt_time(time)
         self.location = self._fmt_location(location)
@@ -150,6 +156,6 @@ class Lesson:
 
 
 if __name__ == '__main__':
-    s = Schedule('schedule.xls')
-    s.save_schedule_as_json()
+    a = Schedule('schedule.xls')
+    a.save_schedule_as_json()
     pass
