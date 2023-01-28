@@ -85,8 +85,27 @@ class Request:
         return response.content
 
     def get_lesson_score(self, semester: str, types: str = '', score: str = 'all') -> bytes:
+        select = {
+            '': '',
+            '公共课': '01',
+            '公共基础课': '02',
+            '专业基础课': '03',
+            '专业课': '04',
+            '专业选修课': '05',
+            '公共选修课': '06',
+            '通识教育必修': '07',
+            '学科基础课': '08',
+            '专业核心课': '09',
+            '方向必修课': '10',
+            '方向选修课': '11',
+            '通识教育选修': '12',
+            '其他': '13',
+            '专业方向课': '14',
+            '专业必修课': '15',
+            '创新创业课': '16',
+        }
         url = self.base_url + 'kscj/cjcx_list'
-        data = {'kksj': semester, 'kcxz': types, 'kcmc': '', 'xsfs': score}
+        data = {'kksj': semester, 'kcxz': select[types], 'kcmc': '', 'xsfs': score}
         response = self.session.get(url, headers=self.headers, params=data)
         assert response.status_code == 200, 'Failed to get lesson score'
         return response.content
