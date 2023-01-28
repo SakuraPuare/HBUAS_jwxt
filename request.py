@@ -76,7 +76,7 @@ class Request:
         return self.session.post(self.base_url + 'xk/LoginToXk', headers=self.headers, data=data)
 
     def post_schedule(self, semester: str) -> httpx.Response:
-        url = self.base_url + 'xskb/xskb_list.do'
+        url = self.base_url + 'xskb/xskb_print.do'
         data = {'xnxq01id': semester, 'zc': ''}
         return self.session.post(url, headers=self.headers, data=data)
 
