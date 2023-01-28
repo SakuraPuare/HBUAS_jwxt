@@ -110,6 +110,11 @@ class Request:
             raise Exception('Wrong username or password')
         return response
 
+    def get_schedule(self, semester: str) -> bytes:
+        response = self.post_schedule(semester)
+        assert response.status_code == 200, 'Failed to get schedule'
+        return response.content
+
 
 if __name__ == "__main__":
     self = Request()
