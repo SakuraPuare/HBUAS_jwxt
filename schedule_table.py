@@ -6,6 +6,15 @@ from typing import Union, Any
 
 import pandas
 
+        elif isinstance(schedule, str):
+            self.schedule = self.load_from_file(schedule)
+        elif isinstance(schedule, bytes):
+            self.schedule = self.load_schedule(schedule)
+        else:
+            self.schedule = {}
+
+            with open(name, 'rb') as f:
+                schedule = self.load_schedule(f.read())
 
 class Lesson:
     def __init__(self, name, teacher, time, location):

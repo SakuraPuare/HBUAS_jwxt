@@ -23,6 +23,8 @@ class Request:
         self.session = httpx.Client(follow_redirects=True)
         self.base_url = config.page.get('url')
 
+        self.is_login = False
+
         self.get(self.base_url)
 
         assert self.session.cookies.get('JSESSIONID') is not None
@@ -108,6 +110,7 @@ class Request:
         response = self.post_login(**kwargs)
         if response.url.path != '/jsxsd/framework/xsMain.jsp':
             raise Exception('Wrong username or password')
+        self.is_login = True
         return response
 
     def get_schedule(self, semester: str) -> bytes:
