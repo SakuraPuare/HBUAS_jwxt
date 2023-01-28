@@ -77,34 +77,19 @@ class Request:
         data = {'encoded': encoded}
         return self.session.post(self.base_url + 'xk/LoginToXk', headers=self.headers, data=data)
 
-    def post_schedule(self, semester: str) -> httpx.Response:
+    def get_schedule(self, semester: str) -> bytes:
         url = self.base_url + 'xskb/xskb_print.do'
         data = {'xnxq01id': semester, 'zc': ''}
-        return self.session.post(url, headers=self.headers, data=data)
+        response = self.session.get(url, headers=self.headers, params=data)
+        assert response.status_code == 200, 'Failed to get schedule'
+        return response.content
 
-    def post_lesson_score(self, semester: str, types: str = '', score: str = 'all') -> httpx.Response:
-        # select = {
-        #     '': '',
-        #     '公共课': '01',
-        #     '公共基础课': '02',
-        #     '专业基础课': '03',
-        #     '专业课': '04',
-        #     '专业选修课': '05',
-        #     '公共选修课': '06',
-        #     '通识教育必修': '07',
-        #     '学科基础课': '08',
-        #     '专业核心课': '09',
-        #     '方向必修课': '10',
-        #     '方向选修课': '11',
-        #     '通识教育选修': '12',
-        #     '其他': '13',
-        #     '专业方向课': '14',
-        #     '专业必修课': '15',
-        #     '创新创业课': '16',
-        # }
+    def get_lesson_score(self, semester: str, types: str = '', score: str = 'all') -> bytes:
         url = self.base_url + 'kscj/cjcx_list'
         data = {'kksj': semester, 'kcxz': types, 'kcmc': '', 'xsfs': score}
-        return self.session.post(url, headers=self.headers, data=data)
+        response = self.session.get(url, headers=self.headers, params=data)
+        assert response.status_code == 200, 'Failed to get lesson score'
+        return response.content
 
     def login(self, **kwargs) -> httpx.Response:
         response = self.post_login(**kwargs)
@@ -112,11 +97,6 @@ class Request:
             raise Exception('Wrong username or password')
         self.is_login = True
         return response
-
-    def get_schedule(self, semester: str) -> bytes:
-        response = self.post_schedule(semester)
-        assert response.status_code == 200, 'Failed to get schedule'
-        return response.content
 
 
 if __name__ == "__main__":
