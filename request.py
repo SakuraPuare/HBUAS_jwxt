@@ -106,6 +106,8 @@ class Request:
 
     def login(self, **kwargs) -> httpx.Response:
         response = self.post_login(**kwargs)
+        if response.url.path != '/jsxsd/framework/xsMain.jsp':
+            raise Exception('Wrong username or password')
         return response
 
 
