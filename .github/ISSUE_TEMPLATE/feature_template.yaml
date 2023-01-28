@@ -1,0 +1,59 @@
+name: ✨ 功能需求
+description: 为项目提出一个新的想法或建议
+title: "[Feature] 标题"
+labels: [enhancement, need review]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        [GitHub Issues](https://github.com/SakuraPuare/HBUAS_jwxt/issues) 专门用于错误报告和功能需求，这意味着我们不接受使用问题。如果您打开的问题不符合要求，它将会被无条件关闭。
+        请在提交问题前阅读以下内容。如果您不遵守以下内容，您的问题可能会被关闭。
+
+        有关程序使用问题，请通过以下途径：
+         - 阅读文档以解决您的问题
+         - 在相关社区内寻求他人解答
+         - 在 [GitHub Discussions](https://github.com/SakuraPuare/HBUAS_jwxt/discussions) 上提问
+         - 在网络中搜索是否有人遇到过类似的问题
+
+        如果您不知道如何有效、准确地提出一个问题，我们建议您先阅读[《提问的智慧》](https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way/blob/main/README-zh_CN.md)。
+  - type: checkboxes
+    attributes:
+      label: 报告清单
+      description: 请确认您已遵守所有必选项。
+      options:
+        - label: 我已仔细阅读并了解上述注意事项。
+          required: true
+        - label: 我已使用最新版本测试过，确认功能还未实现。
+          required: true
+        - label: 我确定在 [GitHub Issues](https://github.com/SakuraPuare/HBUAS_jwxt/issues) 中没有相同或相似的需求。
+          required: true
+        - label: 我愿意补充更多信息，如果需要
+          required: true
+        - label: 我愿意参与到项目的开发中，同时有足够的能力和精力来解决这个问题
+          required: false
+  - type: textarea
+    attributes:
+      label: 功能描述
+      description: 请简要地说明是什么问题导致您想要一个新功能。也许我们可以提出一种现有的解决办法。
+      placeholder: 我希望能够实现 XXX 功能。
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 解决方案
+      description: 如果您有解决方案，请在此处详细说明。
+      placeholder: 我认为可以通过 XXX 方式来实现。
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 功能实现
+      description: 功能实现后应该具有的效果。请尽可能详细地描述，这将有助于我们更好地理解您的需求。
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: 其他信息
+      description: 如果您有其他信息，请在此处详细说明。
+    validations:
+      required: false
