@@ -1,4 +1,7 @@
 httpx~=0.23.3
 pyyaml~=6.0
+beautifulsoup4~=4.11.1
 pandas~=1.5.2
 xlrd~=2.0.1
+prettytable~=3.6.0
+bs4~=0.0.1
