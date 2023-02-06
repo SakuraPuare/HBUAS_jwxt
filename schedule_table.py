@@ -9,26 +9,29 @@ from request import Request
 
 
 class Schedule:
-
     def __init__(self, schedule) -> None:
+        self.byte = b''
+
         if isinstance(schedule, dict):
             self.schedule = schedule
         elif isinstance(schedule, str):
             self.schedule = self.load_from_file(schedule)
         elif isinstance(schedule, bytes):
+            self.byte = schedule
             self.schedule = self.load_schedule(schedule)
         else:
             self.schedule = {}
 
     def load_from_website(self, request: Request, semester: str) -> dict:
         assert request.is_login
-        schedule = request.get_schedule(semester)
-        return self.load_schedule(schedule)
+        self.byte = request.get_schedule(semester)
+        return self.load_schedule(self.byte)
 
     def load_from_file(self, name: str) -> dict:
         if name.endswith('.xls'):
             with open(name, 'rb') as f:
-                schedule = self.load_schedule(f.read())
+                self.byte = f.read()
+                schedule = self.load_schedule(self.byte)
         elif name.endswith('.json'):
             schedule = self.load_schedule_from_json(name)
         elif name.endswith('.pickle'):
@@ -80,11 +83,10 @@ class Schedule:
         with open(path, 'wb') as f:
             pickle.dump(self.schedule, f)
 
-    @staticmethod
-    def save_schedule_as_xls(byte: bytes, name: str = 'schedule.xls') -> None:
+    def save_schedule_as_xls(self, name: str = 'schedule.xls') -> None:
         path = pathlib.Path(name).with_suffix('.xls')
         with open(path, 'wb') as f:
-            f.write(byte)
+            f.write(self.byte)
 
     @staticmethod
     def LessonDecoder(d: dict) -> Any:
@@ -156,6 +158,10 @@ class Lesson:
 
 
 if __name__ == '__main__':
-    a = Schedule('schedule.xls')
-    a.save_schedule_as_json()
+    self = Request()
+    self.login()
+    schedule = Schedule(self.get_schedule('2022-2023-2'))
+
+    schedule.save_schedule_as_json()
+    schedule.save_schedule_as_xls()
     pass
