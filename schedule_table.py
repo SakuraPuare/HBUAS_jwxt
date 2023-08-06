@@ -4,12 +4,79 @@ import pickle
 from typing import Union, Any
 
 import pandas
+from bs4 import BeautifulSoup
 
 from request import Request
 
 
-class Schedule:
+class BaseSchedule:
+    day_dict = {
+        "星期一": "monday",
+        "星期二": "tuesday",
+        "星期三": "wednesday",
+        "星期四": "thursday",
+        "星期五": "friday",
+        "星期六": "saturday",
+        "星期日": "sunday",
+    }
+    day_list = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+    filename = pathlib.Path('schedule')
+
+    def __init__(self):
+        self.schedule = None
+        self.byte = None
+
+    def load_schedule_from_json(self, name: str = None) -> dict:
+        if name is None:
+            path = self.filename.with_suffix('.json')
+        else:
+            path = pathlib.Path(name)
+        with open(path, encoding='u8') as f:
+            return json.load(f, object_hook=self.LessonDecoder)
+
+    def load_schedule_from_pickle(self, name: str = None) -> dict:
+        if name is None:
+            path = self.filename.with_suffix('.pickle')
+        else:
+            path = pathlib.Path(name)
+        with open(path, 'rb') as f:
+            return pickle.load(f)
+
+    def save_schedule_as_json(self, name: str = None) -> None:
+        if name is None:
+            path = self.filename.with_suffix('.json')
+        else:
+            path = pathlib.Path(name)
+        with open(path, 'w', encoding='u8') as f:
+            json.dump(self.schedule, f, indent=4, ensure_ascii=False, cls=Lesson.LessonEncoder)
+
+    def save_schedule_as_pickle(self, name: str = None) -> None:
+        if name is None:
+            path = self.filename.with_suffix('.pickle')
+        else:
+            path = pathlib.Path(name)
+        with open(path, 'wb') as f:
+            pickle.dump(self.schedule, f)
+
+    def save_schedule_as_xls(self, name: str = 'schedule.xls') -> None:
+        if name is None:
+            path = self.filename.with_suffix('.xls')
+        else:
+            path = pathlib.Path(name)
+        with open(path, 'wb') as f:
+            f.write(self.byte)
+
+    @staticmethod
+    def LessonDecoder(d: dict) -> Any:
+        if 'name' in d:
+            return Lesson(**d)
+        else:
+            return d
+
+
+class Schedule(BaseSchedule):
     def __init__(self, schedule) -> None:
+        super().__init__()
         self.byte = b''
 
         if isinstance(schedule, dict):
@@ -31,22 +98,21 @@ class Schedule:
         if name.endswith('.xls'):
             with open(name, 'rb') as f:
                 self.byte = f.read()
-                schedule = self.load_schedule(self.byte)
+                schedule_ = self.load_schedule(self.byte)
         elif name.endswith('.json'):
-            schedule = self.load_schedule_from_json(name)
+            schedule_ = self.load_schedule_from_json(name)
         elif name.endswith('.pickle'):
-            schedule = self.load_schedule_from_pickle(name)
+            schedule_ = self.load_schedule_from_pickle(name)
         else:
             raise ValueError('不支持的文件类型')
-        return schedule
+        return schedule_
 
-    @staticmethod
-    def load_schedule(byte: bytes) -> dict:
+    def load_schedule(self, byte: bytes) -> dict:
         excel = pandas.read_excel(byte, sheet_name='Sheet1')
         lesson_dict = {}
         for column in excel.columns[1:]:
             # 遍历表格每一行
-            day = excel[column][1]
+            day = self.day_dict[excel[column][1]]
             lesson_dict[day] = {}
             for index, row in excel[column].items():
                 if 1 < index < 7:
@@ -62,38 +128,47 @@ class Schedule:
                     lesson_dict[day][index - 2] = list(lesson_list)
         return lesson_dict
 
-    def load_schedule_from_json(self, name: str = 'schedule.json') -> dict:
-        path = pathlib.Path(name)
-        with open(path, 'r', encoding='u8') as f:
-            return json.load(f, object_hook=self.LessonDecoder)
 
-    @staticmethod
-    def load_schedule_from_pickle(name: str = 'schedule.pickle') -> dict:
-        path = pathlib.Path(name)
-        with open(path, 'rb') as f:
-            return pickle.load(f)
+class ClassSchedule(BaseSchedule):
+    def __init__(self, schedule):
+        super().__init__()
+        self.byte = b''
 
-    def save_schedule_as_json(self, name: str = 'schedule.json') -> None:
-        path = pathlib.Path(name)
-        with open(path, 'w', encoding='u8') as f:
-            json.dump(self.schedule, f, indent=4, ensure_ascii=False, cls=Lesson.LessonEncoder)
-
-    def save_schedule_as_pickle(self, name: str = 'schedule.pickle') -> None:
-        path = pathlib.Path(name)
-        with open(path, 'wb') as f:
-            pickle.dump(self.schedule, f)
-
-    def save_schedule_as_xls(self, name: str = 'schedule.xls') -> None:
-        path = pathlib.Path(name).with_suffix('.xls')
-        with open(path, 'wb') as f:
-            f.write(self.byte)
-
-    @staticmethod
-    def LessonDecoder(d: dict) -> Any:
-        if 'name' in d:
-            return Lesson(**d)
+        if isinstance(schedule, dict):
+            self.schedule = schedule
+        elif isinstance(schedule, bytes):
+            self.byte = schedule
+            self.schedule = self.load_schedule(schedule)
         else:
-            return d
+            self.schedule = {}
+
+    def load_from_website(self, request: Request, semester: str, department: str, grade: str, profession: str,
+                          week_start: str = "", week_end: str = "", lesson_start: str = "",
+                          lesson_end: str = "") -> dict[dict]:
+        assert request.is_login
+        self.byte = request.get_class_schedule(semester, department, grade, profession, week_start, week_end,
+                                               lesson_start, lesson_end)
+        return self.load_schedule(self.byte)
+
+    def load_schedule(self, schedule: bytes) -> dict[dict]:
+        soup = BeautifulSoup(schedule, 'html.parser')
+        # replace <br> with \n
+        for br in soup.find_all('br'):
+            br.replace_with('\n')
+        data = soup.find_all('tr')[2:]
+        l = {}
+        for line in data:
+            columns = line.find_all('td')
+            title = columns[0].text.strip()
+            l[title] = {}
+            for index in range(0, 7):
+                l[title][self.day_list[index]] = []
+                for lesson in columns[index * 5 + 1:index * 5 + 6]:
+                    for div in lesson.find_all('div'):
+                        text = div.text.strip().split()
+                        name, teacher, week, location = text[0], text[1], Lesson._fmt_time(text[2][1:], 2), text[3]
+                        l[title][self.day_list[index]].append(Lesson(name, teacher, week, location))
+        return l
 
 
 class Lesson:
@@ -134,10 +209,13 @@ class Lesson:
             return [i.replace('()', '') for i in s.split(',') if i != '']
 
     @staticmethod
-    def _fmt_time(s: Union[str, list]) -> list:
+    def _fmt_time(s: Union[str, list], sub: int = 3) -> list:
         if isinstance(s, list):
             return s
-        s = s[:-3]
+        if isinstance(s, int):
+            return [s]
+        if s != 0:
+            s = s[:-sub]
         time = s.split(',')
         t = []
         for week in time:
@@ -160,8 +238,5 @@ class Lesson:
 if __name__ == '__main__':
     self = Request()
     self.login()
-    schedule = Schedule(self.get_schedule('2022-2023-2'))
-
-    schedule.save_schedule_as_json()
-    schedule.save_schedule_as_xls()
+    schedule = ClassSchedule(self.get_class_schedule('2023-2024-1', '20', '2022', '080605'))
     pass
